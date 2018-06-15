@@ -3,9 +3,10 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const addPage = require('../views/addPage');
 const Sequelize = require('sequelize');
+const wikiPage = require('../views/wikipage');
+const mainPage = require('../views/main');
 
 const {Page} = require("../models/");
-console.log(Page);
 
 
 router.use(bodyParser.urlencoded({extended:false}));
@@ -16,16 +17,19 @@ router.get('/add', (req, res, next) =>
 		res.send(addPage());
 	});
 
-router.get('/', (req, res, next) =>
+router.get('/', async (req, res, next) =>
 	{
-
+		let newPage = await Page.findAll();
+		let mainStr = "";
+		for (let i = 0; i < newPage.length; i++)
+		{
+			mainStr+="<a href = wiki/" + newPage[0].slug + ">" + newPage[0].title + "</a>";
+		}
+		res.send(mainPage(mainStr));
 	});
 
 router.post('/', async (req, res, next) =>
 	{
-		console.log(req.body);
-		res.json(req.body);
-
 		const postPage = new Page(
 		{
 			title: req.body.title,
@@ -35,11 +39,26 @@ router.post('/', async (req, res, next) =>
 		try
 		{
 			await postPage.save();
-			console.log(postPage);
-			return res.redirect('/');
+			res.redirect(`/wiki/${postPage.slug}`);
+			return;
+		}
+		catch (error) {next(error);}
+	});
+
+router.get('/:slug', async(req,res,next) =>
+	{
+		try
+		{
+			const page = await Page.findOne(
+			{
+				where: 
+				{
+					slug:req.params.slug
+				}
+			});
+			res.send(wikiPage(page,page.author));
 		}
 		catch (error) {next(error)}
 	});
-
 
 module.exports = router;

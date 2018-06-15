@@ -32,6 +32,13 @@ Page.beforeValidate((page, options) =>
 	page.slug = page.title.replace(/\s+/g, '_').replace(/\W/g, '');
 });
 
+Page.getAll = function()
+{
+	return Page.findAll({
+		raw: true
+	});
+};
+
 const User = db.define('user',
 {
 	name:
