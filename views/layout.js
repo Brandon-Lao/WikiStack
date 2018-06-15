@@ -28,8 +28,8 @@ module.exports = (content) => html`<!DOCTYPE html>
           </div>
         </div>
       </div>
-      <div class="container content">
-        $${content}
+      <div class="container content">`
+      + content + `
       </div>
       <hr/>
       <div id="footer" class="container text-muted">
