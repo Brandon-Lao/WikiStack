@@ -3,7 +3,7 @@ const morgan = require("morgan");
 // const client = require("./db");
 const layout = require("./views/layout.js");
 const bodyParser = require('body-parser');
-const { db } = require('./models');
+const models = require('./models');
 
 const app = express();
 
@@ -18,11 +18,17 @@ app.get("/", (req, res) => {
 
 const PORT = 1337;
 
-app.listen(PORT, () => {
-  console.log(`App listening in port ${PORT}`);
+const synchro = async() =>
+{
+	await models.db.sync({force: true});
+	app.listen(PORT, () => {
+	console.log(`App listening in port ${PORT}`);
+});
+};
+models.db.authenticate().
+then(() => {
+  console.log('Database connection operational.');
 });
 
-db.authenticate().then(() => 
-{
-	console.log('Database connection online.');
-});
+synchro();
+
